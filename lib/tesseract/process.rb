@@ -106,6 +106,10 @@ module Tesseract
       txt_file = "#{temp_text_file}.txt"
       executed = system [@options[:tesseract_command], image_file.to_s, temp_text_file.to_s, "-l #{@options[:lang]}", config_file, "&> /dev/null"].join(' ')
       raise RuntimeError, "`#{@options[:tesseract_command]}` could not be executed." if (executed.nil? || executed == false)
+      # wait until file (amazon cloud bug)
+      until File.exist?(txt_file)
+        sleep 1
+      end
       out = File.read(txt_file)
       File.unlink txt_file
       out
